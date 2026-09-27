@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SmartPocket — gérez simplement votre budget mensuel, vos dépenses et vos objectifs d'épargne.">
+  <title>SmartPocket — Budget étudiant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenu-principal">Aller au contenu</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="40" height="40" focusable="false">
+            <rect x="4" y="10" width="32" height="22" rx="6" fill="currentColor" opacity="0.18"/>
+            <rect x="7" y="8" width="26" height="18" rx="5" fill="currentColor"/>
+            <circle cx="27" cy="17" r="3.2" fill="#ecfdf5"/>
+          </svg>
+        </span>
+        <div>
+          <h1>SmartPocket</h1>
+          <p class="tagline">Gérez votre budget simplement et intelligemment</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-ghost" id="btn-modifier-budget">Modifier le budget</button>
+        <button type="button" class="btn btn-danger-ghost" id="btn-reinitialiser">Réinitialiser les données</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenu-principal" class="layout">
+    <!-- Tableau de bord -->
+    <section class="panel dashboard" aria-labelledby="titre-dashboard">
+      <div class="section-head">
+        <h2 id="titre-dashboard">Tableau de bord</h2>
+        <p class="muted" id="periode-affichage"></p>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <p class="kpi-label">Budget mensuel</p>
+          <p class="kpi-value" id="kpi-budget">0 DT</p>
+          <p class="kpi-hint" id="kpi-budget-hint">Objectif du mois</p>
+        </article>
+        <article class="kpi-card">
+          <p class="kpi-label">Total dépensé</p>
+          <p class="kpi-value" id="kpi-depense">0 DT</p>
+          <p class="kpi-hint" id="kpi-depense-hint">Toutes catégories</p>
+        </article>
+        <article class="kpi-card" id="card-solde">
+          <p class="kpi-label">Solde restant</p>
+          <p class="kpi-value" id="kpi-solde">0 DT</p>
+          <p class="kpi-hint" id="kpi-solde-hint">Budget − dépenses</p>
+        </article>
+        <article class="kpi-card">
+          <p class="kpi-label">Épargne</p>
+          <p class="kpi-value" id="kpi-epargne">0 DT</p>
+          <p class="kpi-hint" id="kpi-epargne-hint">Montant déjà économisé</p>
+        </article>
+      </div>
+
+      <div class="budget-progress">
+        <div class="progress-meta">
+          <span id="progress-label">Consommation du budget</span>
+          <strong id="progress-percent">0 %</strong>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar" aria-labelledby="progress-label">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="status-badge" id="budget-status"></p>
+      </div>
+    </section>
+
+    <!-- Configuration du budget (panneau masqué / affiché) -->
+    <section class="panel" id="section-budget" hidden>
+      <h2>Configuration du budget</h2>
+      <form id="form-budget" class="form-grid" novalidate>
+        <div class="field">
+          <label for="input-budget">Budget mensuel (DT)</label>
+          <input type="number" id="input-budget" name="budget" min="0" step="0.01" required>
+          <p class="field-error" id="erreur-budget" hidden></p>
+        </div>
+        <div class="field">
+          <label for="input-epargne-mensuelle">Objectif d'épargne mensuel (DT) — optionnel</label>
+          <input type="number" id="input-epargne-mensuelle" name="epargneMensuelle" min="0" step="0.01">
+          <p class="field-error" id="erreur-epargne-mensuelle" hidden></p>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Enregistrer le budget</button>
+          <button type="button" class="btn btn-ghost" id="btn-annuler-budget">Annuler</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="two-col">
+      <!-- Ajout des dépenses -->
+      <section class="panel" aria-labelledby="titre-ajout">
+        <h2 id="titre-ajout">Ajouter une dépense</h2>
+        <form id="form-depense" novalidate>
+          <div class="field">
+            <label for="input-description">Description</label>
+            <input type="text" id="input-description" name="description" maxlength="80" required placeholder="Ex. : déjeuner au CROUS">
+            <p class="field-error" id="erreur-description" hidden></p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="input-montant">Montant (DT)</label>
+              <input type="number" id="input-montant" name="montant" min="0.01" step="0.01" required>
+              <p class="field-error" id="erreur-montant" hidden></p>
+            </div>
+            <div class="field">
+              <label for="input-date">Date</label>
+              <input type="date" id="input-date" name="date" required>
+              <p class="field-error" id="erreur-date" hidden></p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="input-categorie">Catégorie</label>
+            <select id="input-categorie" name="categorie" required>
+              <option value="">Choisir une catégorie</option>
+            </select>
+            <p class="field-error" id="erreur-categorie" hidden></p>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-submit-depense">Ajouter la dépense</button>
+            <button type="button" class="btn btn-ghost" id="btn-annuler-edition" hidden>Annuler la modification</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Historique -->
+      <section class="panel" aria-labelledby="titre-historique">
+        <div class="section-head">
+          <h2 id="titre-historique">Historique des dépenses</h2>
+        </div>
+        <div class="toolbar">
+          <div class="field compact">
+            <label for="filtre-categorie">Filtrer par catégorie</label>
+            <select id="filtre-categorie">
+              <option value="toutes">Toutes les catégories</option>
+            </select>
+          </div>
+          <div class="field compact">
+            <label for="tri-depenses">Trier</label>
+            <select id="tri-depenses">
+              <option value="date-desc">Plus récente</option>
+              <option value="date-asc">Plus ancienne</option>
+              <option value="montant-asc">Montant croissant</option>
+              <option value="montant-desc">Montant décroissant</option>
+            </select>
+          </div>
+        </div>
+        <ul class="expense-list" id="liste-depenses"></ul>
+      </section>
+    </div>
+
+    <div class="two-col">
+      <!-- Analyse -->
+      <section class="panel" aria-labelledby="titre-analyse">
+        <h2 id="titre-analyse">Analyse des dépenses</h2>
+        <p class="muted">Répartition par catégorie (graphique généré localement, sans bibliothèque externe).</p>
+        <div class="chart-wrap">
+          <canvas id="graphique-categories" width="320" height="320" aria-label="Graphique de répartition des dépenses par catégorie"></canvas>
+          <ul class="legend" id="legende-categories"></ul>
+        </div>
+      </section>
+
+      <!-- Smart Assistant -->
+      <section class="panel assistant" aria-labelledby="titre-assistant">
+        <h2 id="titre-assistant">Smart Assistant</h2>
+        <p class="muted">Conseils générés automatiquement à partir de vos données, selon des règles locales (pas d'IA externe).</p>
+        <ul class="tips" id="liste-conseils"></ul>
+      </section>
+    </div>
+
+    <!-- Objectif d'épargne -->
+    <section class="panel" aria-labelledby="titre-objectif">
+      <div class="section-head">
+        <h2 id="titre-objectif">Mon objectif d'épargne</h2>
+        <div class="header-actions">
+          <button type="button" class="btn btn-ghost" id="btn-modifier-objectif">Modifier l'objectif</button>
+          <button type="button" class="btn btn-danger-ghost" id="btn-supprimer-objectif">Supprimer l'objectif</button>
+        </div>
+      </div>
+
+      <div id="objectif-affichage" class="goal-display">
+        <div>
+          <p class="kpi-label">Objectif</p>
+          <p class="goal-name" id="objectif-nom">Aucun objectif défini</p>
+        </div>
+        <div class="goal-stats">
+          <div>
+            <p class="kpi-label">Montant cible</p>
+            <p id="objectif-cible">—</p>
+          </div>
+          <div>
+            <p class="kpi-label">Économisé</p>
+            <p id="objectif-economise">—</p>
+          </div>
+          <div>
+            <p class="kpi-label">Progression</p>
+            <p id="objectif-progression">—</p>
+          </div>
+        </div>
+        <div class="progress-track tall" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="objectif-bar" aria-label="Progression de l'objectif d'épargne">
+          <div class="progress-fill savings" id="objectif-fill"></div>
+        </div>
+      </div>
+
+      <form id="form-objectif" class="form-grid" hidden novalidate>
+        <div class="field">
+          <label for="input-objectif-nom">Nom de l'objectif</label>
+          <input type="text" id="input-objectif-nom" maxlength="80" required placeholder="Ex. : Nouveau téléphone">
+          <p class="field-error" id="erreur-objectif-nom" hidden></p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="input-objectif-cible">Montant cible (DT)</label>
+            <input type="number" id="input-objectif-cible" min="0.01" step="0.01" required>
+            <p class="field-error" id="erreur-objectif-cible" hidden></p>
+          </div>
+          <div class="field">
+            <label for="input-objectif-economise">Montant déjà économisé (DT)</label>
+            <input type="number" id="input-objectif-economise" min="0" step="0.01" required>
+            <p class="field-error" id="erreur-objectif-economise" hidden></p>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Enregistrer l'objectif</button>
+          <button type="button" class="btn btn-ghost" id="btn-annuler-objectif">Annuler</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>SmartPocket — application locale pour étudiants. Devise : dinar tunisien (DT / TND). Données stockées uniquement dans votre navigateur.</p>
+  </footer>
+
+  <!-- Dialogue de confirmation -->
+  <dialog id="dialog-confirm" class="dialog">
+    <h3 id="dialog-titre">Confirmation</h3>
+    <p id="dialog-message"></p>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" id="dialog-annuler-btn">Annuler</button>
+      <button type="button" class="btn btn-danger" id="dialog-confirm-btn">Confirmer</button>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
